@@ -1,7 +1,6 @@
 import { useStore } from "../zustand/store"
-import { toNumber } from 'ethers/utils'
 import { TeamCardsOptions } from '../const/const'
-import moment from "moment"
+import moment from "moment-timezone"
 
 export function RecentPlayers() {
   const { boughtRecords } = useStore()
@@ -15,7 +14,7 @@ export function RecentPlayers() {
         {boughtRecords?.map((record, idx) => (
           <div key={idx} className="w-full flex flex-col p-3 pb-0 text-[14px]">
             <p>
-              {moment.unix(toNumber(record.args.time)).format('YYYY/MM/DD HH:MM')}
+              {moment.unix(record.args.time.toNumber()).format('YYYY/MM/DD HH:mm')}
             </p>
             <div className="w-full flex flex-col">
               <p className="">Address:</p>
@@ -28,20 +27,20 @@ export function RecentPlayers() {
                 <span>{'Team: '}</span>
                 <span 
                   style={
-                    toNumber(record.args.teamId) === 0
+                    record.args.teamId.toNumber() === 0
                       ? { color: '#ff9cba' }
-                    : toNumber(record.args.teamId) === 1
+                    : record.args.teamId.toNumber() === 1
                       ? { color: '#fecb4b' }
-                    : toNumber(record.args.teamId) === 2
+                    : record.args.teamId.toNumber() === 2
                       ? { color: '#a178f9' }
                     : { color: '#90c052' }
                   }
                 >
-                  {TeamCardsOptions[toNumber(record.args.teamId)]}
+                  {TeamCardsOptions[record.args.teamId.toNumber()]}
                 </span>
               </span>
               <span>
-                {toNumber(record.args.amount) / 1000000} ROE
+                {record.args.amount.toNumber() / 1000000} ROE
               </span>
             </p>
           </div>

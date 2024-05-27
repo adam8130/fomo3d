@@ -11,9 +11,8 @@ import { TextDialog } from './components/TextDialog';
 import { InfoDialog } from './components/InfoDialog';
 
 import { ethers } from 'ethers';
-import { signer } from './plugin/ethers';
+import { provider, signer } from './plugin/ethers';
 import { Fomo3DContractABI } from './plugin/abi/Fomo3DAbi';
-import { toNumber } from 'ethers/utils'
 import { useStore } from "./zustand/store";
 
 import moment from 'moment';
@@ -54,55 +53,86 @@ export default function App() {
   
   const [leftActiveTab, setLeftActiveTab] = useState(0)
   const [rightActiveTab, setRightActiveTab] = useState(0)
+  const [lastWinner, setLastWinner] = useState(null)
+  const [lastPrize, setLastPrize] = useState(0)
   const [endTime, setEndTime] = useState(null)
   
-  const { contract, walletAddress, jackpot, roundId, boughtRecords, textDialog, isLoading, infoDialog, isColddowning } = useStore()
-  const { setContract, setWalletAddress, setRoundId, setJackPot } = useStore()
-  const { setUserOwnedKeys, setIsColddowning, setBoughtRecords, setTextDialog, setInfoDialog } = useStore()
+  const { contract, jackpot, boughtRecords, textDialog, isLoading, infoDialog, isColddowning } = useStore()
+  const { setContract, setWalletAddress, setRoundId, setJackPot, setUserOwnedKeys, setBoughtRecords } = useStore()
+  const { setIsColddowning, setTextDialog, setInfoDialog } = useStore()
 
-  // init ethers
   useEffect(() => {
     const initContract = async () => {
-      const contract = new ethers.Contract(
-        process.env.REACT_APP_CONTRACT_ADDRESS, 
-        Fomo3DContractABI, 
-        signer
-      )
-      const walletAddress = await signer.getAddress()
-      
-      setContract(contract)
-      setWalletAddress(walletAddress)
+      try {
+        // new contract
+        const contract = new ethers.Contract(
+          process.env.REACT_APP_CONTRACT_ADDRESS, 
+          Fomo3DContractABI, 
+          provider
+        )
+
+        // get round info
+        const roundId = await contract.CURRENT_ROUND_ID()
+        const roundInfo = await contract.getRound(roundId)
+
+        setRoundId(roundId.toNumber())
+        setJackPot(roundInfo.pool.toNumber() / 1000000)
+        setContract(contract)
+
+        // get last winner
+        if (roundId.toNumber() !== 0) {
+          const roundInfo = await contract.getRound(roundId - 1)
+          const lastWinner = roundInfo.lastPlayer
+          const lastJackpot = (roundInfo.pool.toNumber() / 1000000) * 0.48
+          setLastWinner(lastWinner)
+          setLastPrize(lastJackpot)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+
+      try {
+        // get user info
+        const contract = new ethers.Contract(
+          process.env.REACT_APP_CONTRACT_ADDRESS, 
+          Fomo3DContractABI, 
+          signer
+        )
+
+        const roundId = await contract.CURRENT_ROUND_ID()
+        const walletAddress = await signer.getAddress()
+        const userInfo = await contract.roundPlayers(roundId, walletAddress)
+        const userOwnedKeys = userInfo.ownedKeys.toNumber()
+        setUserOwnedKeys(userOwnedKeys)
+        setWalletAddress(walletAddress)
+      } catch (err) {
+        console.log(err)
+      }
     }
     initContract()
-  }, [setContract, setWalletAddress])
+  }, [setContract, setWalletAddress, setRoundId, setJackPot, setUserOwnedKeys, setLastWinner])
 
   useEffect(() => {
     if (!contract) return
     
     const getRemainingTime = async () => {
       const remainingColdTime = await contract.getColdDownTime()
-      const remainingColdSeconds = toNumber(remainingColdTime)
-      console.log('remainingColdSeconds', remainingColdSeconds)
+      const remainingColdSeconds = remainingColdTime.toNumber()
 
       const remainingEndTime = await contract.getRemainingTime()
-      const remainingEndSecond = toNumber(remainingEndTime)
-      console.log('remainingEndSecond', remainingEndSecond)
+      const remainingEndSecond = remainingEndTime.toNumber()
 
       const isColddowning = remainingColdSeconds > 0
-      console.log('isColddowning', isColddowning)
       
       let timer
       if (isColddowning) {
         setEndTime(remainingColdSeconds)
-        timer = setTimeout(
-          () => {
+        timer = setTimeout(() => {
             setIsColddowning(false)
             setEndTime(remainingEndSecond)
-          }, 
-          (remainingColdSeconds + 1) * 1000
+          }, (remainingColdSeconds + 1) * 1000
         )
-      } 
-      else {
+      } else {
         setEndTime(remainingEndSecond)
       }
       setIsColddowning(isColddowning)
@@ -115,43 +145,44 @@ export default function App() {
   }, [setIsColddowning, contract])
 
   useEffect(() => {
-    if (!contract) return
-  
-    const getCurrentRound = async () => {
-      const roundInfo = await contract.getRound()
-      console.log('roundInfo', roundInfo)
-
-      const jackpot = toNumber(roundInfo.pool)
-      const roundId = toNumber(roundInfo.roundId)
-
-      setRoundId(roundId)
-      setJackPot(jackpot / 1000000)
-    }
-    getCurrentRound()
-  }, [contract, setRoundId, setJackPot, setEndTime, setIsColddowning])
-
-  useEffect(() => {
-    if (roundId === null) return
-
-    const getUserInfo = async () => {
-      const id = await contract.CURRENT_ROUND_ID()
-      const userInfo = await contract.roundPlayers(id, walletAddress)
-      console.log('userInfo', userInfo)
-
-      const userOwnedKeys = toNumber(userInfo.ownedKeys)
-      setUserOwnedKeys(userOwnedKeys)
-    }
-    getUserInfo()
-  }, [roundId, contract, walletAddress, setUserOwnedKeys])
-
-  useEffect(() => {
     if (!contract) return;
+
+    const getLogsInRange = async (filter, fromBlock, toBlock, step = 1000) => {
+      let allLogs = [];
+      const fixedStep = toBlock - fromBlock < step ? toBlock - fromBlock : step;
+      for (
+        let block = fromBlock; 
+        block <= toBlock; 
+        block += fixedStep
+      ) {
+        const start = block;
+        const end = Math.min(block + fixedStep - 1, toBlock);
+
+        try {
+          const logs = await contract.queryFilter(filter, start, end);
+          allLogs = allLogs.concat(logs);
+        } catch (error) {
+          console.error(`Error fetching logs from block ${start} to ${end}:`, error);
+        }
+      }
+
+      return allLogs;
+    };
 
     const getBuyRecords = async () => {
       const filter = contract.filters.OnKeyBought();
-      const logs = await contract.queryFilter(filter);
-      console.log('logs', logs.slice(-4).reverse());
-      setBoughtRecords(logs.slice(-4).reverse());
+
+      try {
+        const startBlock = await contract.START_BLOCK();
+        const endBlock = await contract.provider.getBlockNumber();
+        if (startBlock.toNumber()) {
+          const logs = await getLogsInRange(filter, startBlock.toNumber(), endBlock);
+          console.log('logs', logs.slice(-4).reverse());
+          setBoughtRecords(logs.slice(-4).reverse());
+        }
+      } catch (error) {
+        console.error('Error fetching block number or logs:', error);
+      }
     };
 
     getBuyRecords();
@@ -159,7 +190,6 @@ export default function App() {
 
   useEffect(() => {
     if (endTime !== null && endTime > 0) {
-
       const timer = setInterval(() => {
         setEndTime((prevTime) => prevTime - 1);
       }, 1000);
@@ -185,7 +215,7 @@ export default function App() {
 
   return (
     <div className="w-full h-[120vh] max-lg:h-full flex flex-col relative">
-      <div className="h-[23vh] bg-[#fdfdfd] flex flex-col items-center justify-between">
+      <div className="h-[175px] bg-[#fdfdfd] flex flex-col items-center justify-between">
         <div className='flex items-center gap-[12px] mt-4 translate-x-[18px] '>
           <h1 className={`text-[42px] font-[900] bg-clip-text text-transparent ${Gradient_Text}`}>
             {jackpot}
@@ -209,6 +239,26 @@ export default function App() {
                 variants={marqueeVariants} 
                 animate="animate"
               >
+                {lastWinner && (
+                  <div className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded">
+                    <p className="flex gap-[6px]">
+                      <span className="text-red-600 whitespace-nowrap">
+                        Last Winner: 
+                      </span>
+                      <span className='text-[#ffa95e] whitespace-nowrap'>
+                        {lastWinner}
+                      </span>
+                    </p>
+                    <p className="flex gap-[6px]">
+                      <span className="text-red-600 whitespace-nowrap">
+                        Prize: 
+                      </span>
+                      <span className='text-[#ffa95e] whitespace-nowrap'>
+                        {lastPrize} ROE
+                      </span>
+                    </p>
+                  </div>
+                )}
                 {boughtRecords?.map((record, idx) => (
                   <div key={idx} className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded">
                     <p className="flex gap-[6px]">
@@ -218,7 +268,7 @@ export default function App() {
                     <p className="flex gap-[6px]">
                       <span>Bought:</span>
                       <span className='text-[#ffa95e] whitespace-nowrap'>
-                        {toNumber(record.args.boughtKeys)} Keys
+                        {record.args.boughtKeys.toNumber()} Keys
                       </span>
                     </p>
                   </div>
@@ -230,7 +280,7 @@ export default function App() {
           }
         </div>
       </div>
-      <div className="w-full h-[97vh] object-cover flex justify-center gap-[28px] pt-[36px] pb-[36px] max-lg:flex-col max-lg:items-center max-lg:h-full max-lg:pt-10 max-lg:pb-20" 
+      <div className="w-full h-[97vh] object-cover flex justify-center gap-[28px] pt-[36px] pb-[36px] max-lg:flex-col max-lg:items-center max-lg:h-full max-lg:pt-6 max-lg:pb-20" 
         style={{ background: `url(${Background}) no-repeat center center / cover` }}
       >
         <div className="w-[490px] max-lg:w-[95%] h-[630px]">

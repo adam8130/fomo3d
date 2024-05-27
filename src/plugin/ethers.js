@@ -6,8 +6,8 @@ let signer
 const ourChainId = process.env.REACT_APP_CHAIN_ID
 
 if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
-  provider = new ethers.BrowserProvider(window.ethereum)
-  signer = await provider.getSigner();
+  provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+  signer = provider.getSigner()
 
   const initEthers = async () => {
     const { chainId } = await provider.getNetwork()
@@ -28,7 +28,7 @@ const changeNetwork = async () => {
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.toQuantity(ourChainId) }],
+      params: [{ chainId: ethers.utils.hexStripZeros(Number((ourChainId))) }],
     })
   } catch (switchError) {
     // This error code indicates that the chain has not been added to MetaMask.
@@ -38,7 +38,7 @@ const changeNetwork = async () => {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: ethers.toQuantity(ourChainId),
+              chainId: ethers.utils.hexStripZeros(Number((ourChainId))),
               chainName: 'amoy-matic-' + ourChainId,
               nativeCurrency: {
                 name: 'MATIC',

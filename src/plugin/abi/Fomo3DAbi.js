@@ -10,6 +10,19 @@ export const Fomo3DContractABI = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+    ],
+    name: "OnGameStarted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "player",
@@ -163,6 +176,13 @@ export const Fomo3DContractABI = [
   },
   {
     inputs: [],
+    name: "START_BLOCK",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "airdropReward",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
@@ -209,13 +229,20 @@ export const Fomo3DContractABI = [
   },
   {
     inputs: [],
-    name: "getRemainingTime",
+    name: "getMyEarnings",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
+    name: "getRemainingTime",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_rId", type: "uint256" }],
     name: "getRound",
     outputs: [
       { internalType: "uint256", name: "roundId", type: "uint256" },
@@ -234,7 +261,7 @@ export const Fomo3DContractABI = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [{ internalType: "uint256", name: "_rId", type: "uint256" }],
     name: "getRoundTotalKeys",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
@@ -288,6 +315,13 @@ export const Fomo3DContractABI = [
     name: "officialWithdraw",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "roundBlockNumber",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
     type: "function",
   },
   {

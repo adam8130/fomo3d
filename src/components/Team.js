@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../zustand/store'
-import { toNumber } from 'ethers/utils'
 
 import Apple_Icon from '../assets/apple.webp'
 import Banana_Icon from '../assets/banana.webp'
@@ -34,23 +33,24 @@ export function Team() {
     if (!contract) return
 
     const getCurrentRound = async () => {
-      const currentRound = await contract.getRound()
+      const roundId = await contract.CURRENT_ROUND_ID()
+      const currentRound = await contract.getRound(roundId)
       setTeamInfo({
         apple: {
-          key: toNumber(currentRound.teamKeys[0]),
-          player: toNumber(currentRound.teamPlayers[0])
+          key: currentRound.teamKeys[0].toNumber(),
+          player: currentRound.teamPlayers[0].toNumber()
         },
         banana: {
-          key: toNumber(currentRound.teamKeys[1]),
-          player: toNumber(currentRound.teamPlayers[1])
+          key: currentRound.teamKeys[1].toNumber(),
+          player: currentRound.teamPlayers[1].toNumber()
         },
         grape: {
-          key: toNumber(currentRound.teamKeys[2]),
-          player: toNumber(currentRound.teamPlayers[2])
+          key: currentRound.teamKeys[2].toNumber(),
+          player: currentRound.teamPlayers[2].toNumber()
         },
         lemon: {
-          key: toNumber(currentRound.teamKeys[3]),
-          player: toNumber(currentRound.teamPlayers[3])
+          key: currentRound.teamKeys[3].toNumber(),
+          player: currentRound.teamPlayers[3].toNumber()
         }
       })
     }

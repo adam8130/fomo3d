@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { ROEContractABI } from '../plugin/abi/RoeABI'
+import { Fomo3DContractABI } from '../plugin/abi/Fomo3DAbi'
 import { ethers } from 'ethers'
-import { signer } from '../plugin/ethers'
+import { provider, signer } from '../plugin/ethers'
 import { motion } from 'framer-motion'
 import { useStore } from '../zustand/store'
 import { TeamCard } from './TeamCard'
 import { TeamCardsOptions } from '../const/const'
-import { toNumber } from 'ethers/utils'
 
 import Apple_Icon from '../assets/apple.webp'
 import Banana_Icon from '../assets/banana.webp'
@@ -64,11 +64,9 @@ export function Purchase() {
 
       const airdropReward = await contract.airdropReward()
       const currentAirdropTracker = await contract.currentAirdropTracker()
-      console.log('currentAirdropTracker', currentAirdropTracker)
-      console.log('airdropReward', airdropReward)
       
-      setAirdropReward(toNumber(airdropReward) / 1000000)
-      setCurrentAirdropTracker(toNumber(currentAirdropTracker) / 100)
+      setAirdropReward(airdropReward.toNumber() / 1000000)
+      setCurrentAirdropTracker(currentAirdropTracker.toNumber() / 100)
 
       setBigIntKeyPrice(bigIntKeyPrice)
       setFinalKeyPrice(bigIntKeyPrice * ((1 - (1.01 ** 1)) / (1 - 1.01)))
@@ -86,6 +84,11 @@ export function Purchase() {
 
     setFinalKeyPrice(Math.round(calculatedPrice))
     setSelectedKeyAmount(amount)
+  }
+
+  const handleSendROE = async () => {
+    await provider.send('eth_requestAccounts', [])
+    setPurchaseDialog(true)
   }
 
   return (
@@ -142,7 +145,7 @@ export function Purchase() {
         <div className="flex justify-between">
           <span 
             className="w-full h-[40px] bg-[#ffa95e] text-center leading-[40px] rounded cursor-pointer text-white border border-[#ffa95e] hover:bg-[#ffa95e20] transition-3"
-            onClick={() => setPurchaseDialog(true)}
+            onClick={() => handleSendROE()}
           >
             Send ROE
           </span>
@@ -228,7 +231,12 @@ function PurchaseDialog({
       await approvedTX.wait()
       console.log(approvedTX)
   
-      const tx = await contract.buyKey(
+      const Fomo3DContract = new ethers.Contract(
+        process.env.REACT_APP_CONTRACT_ADDRESS,
+        Fomo3DContractABI,
+        signer
+      )
+      const tx = await Fomo3DContract.buyKey(
         validAddress || '0x0000000000000000000000000000000000000000', 
         selectedTeamIdx, 
         finalKeyPrice

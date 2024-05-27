@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
-import { toNumber } from 'ethers/utils'
 import { useStore } from "../zustand/store"
+import { ethers } from "ethers"
+import { Fomo3DContractABI } from "../plugin/abi/Fomo3DAbi"
+import { signer } from "../plugin/ethers"
 
 import Question_Icon from '../assets/circle-question.svg'
 
@@ -13,7 +15,7 @@ const VaultInfo = [
 
 export function Vault() {
 
-  const { contract, setTextDialog, setIsLoading, setInfoDialog } = useStore()
+  const { setTextDialog, setIsLoading, setInfoDialog } = useStore()
   const [vaultInfo, setVaultInfo] = useState({
     expectedBenefits: 0,
     availableBenefits: 0,
@@ -22,15 +24,19 @@ export function Vault() {
   })
 
   useEffect(() => {
-    if (!contract) return
-
     const init = async () => {
+      const contract = new ethers.Contract(
+        process.env.REACT_APP_CONTRACT_ADDRESS, 
+        Fomo3DContractABI, 
+        signer
+      )
+
       const vaultInfo = await contract.getVault()
       console.log('vaultInfo', vaultInfo)
 
-      const expectedBenefits = toNumber(vaultInfo.expected) / 1000000
-      const availableBenefits = toNumber(vaultInfo.avaliable) / 1000000
-      const referralBouns = toNumber(vaultInfo.referral) / 1000000
+      const expectedBenefits = vaultInfo.expected.toNumber() / 1000000
+      const availableBenefits = vaultInfo.avaliable.toNumber() / 1000000
+      const referralBouns = vaultInfo.referral.toNumber() / 1000000
       const totalGains = availableBenefits + referralBouns
 
       setVaultInfo({
@@ -41,10 +47,15 @@ export function Vault() {
       })
     }
     init()
-  }, [contract])
+  }, [])
 
   const handleWithdraw = async () => {
     try {
+      const contract = new ethers.Contract(
+        process.env.REACT_APP_CONTRACT_ADDRESS, 
+        Fomo3DContractABI, 
+        signer
+      )
       setIsLoading(true)
       const withdrawTX = await contract.withdraw()
       await withdrawTX.wait()
@@ -57,14 +68,12 @@ export function Vault() {
       })
     } catch (err) {
       console.log(err)
-      setIsLoading(true)
+      setIsLoading(false)
       setTextDialog({
         title: 'Transaction failed',
         text: "Oops there's something went wrong ."
       })
     }
-
-    
   }
 
   return (
@@ -74,25 +83,25 @@ export function Vault() {
         <div className="flex justify-between gap-[6px] items-center">
           <span className="text-[18px]">Expected Benefits</span>
           <span className="text-[32px] max-lg:text-[24px]">
-            {vaultInfo.expectedBenefits} ROE
+            {vaultInfo.expectedBenefits ? vaultInfo.expectedBenefits.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center">
           <span className="text-[18px]">Available Benefits</span>
           <span className="text-[32px] max-lg:text-[24px]">
-            {vaultInfo.availableBenefits} ROE
+            {vaultInfo.availableBenefits ? vaultInfo.availableBenefits.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center pb-[18px] border-b border-[#22222290]">
           <span className="text-[18px]">Referral Bouns</span>
           <span className="text-[32px] max-lg:text-[24px]">
-            {vaultInfo.referralBouns} ROE
+            {vaultInfo.referralBouns ? vaultInfo.referralBouns.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center relative">
           <span className="text-[18px]">Total Gains</span>
           <span className="text-[32px] max-lg:text-[24px] [text-shadow:0_0_8px_#a178f9]">
-            {vaultInfo.totalGains} ROE
+            {vaultInfo.totalGains ? vaultInfo.totalGains.toFixed(6) : 0} ROE
           </span>
           {/* <p className="absolute right-0 top-[42px]">
             500,000 USDT
@@ -109,5 +118,3 @@ export function Vault() {
     </div>
   )
 }
-
-// total gain = Exit Scammed + Bad Advice

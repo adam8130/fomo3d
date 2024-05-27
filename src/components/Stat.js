@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../zustand/store';
-import { toNumber } from 'ethers/utils'
 import moment from 'moment';
 
 import ROE_coin from '../assets/roe.webp';
@@ -29,12 +28,12 @@ export function Stat() {
     const init = async () => {
       const statInfo = await contract.getStats()
 
-      const totalInvested = toNumber(statInfo.totalInvested) / 1000000
-      const distributedRewards = toNumber(statInfo.totalDistributed) / 1000000
-      const timePurchased = toNumber(statInfo.totalKeys) / 1000000 * 0.5
+      const totalInvested = statInfo.totalInvested.toNumber() / 1000000
+      const distributedRewards = statInfo.totalDistributed.toNumber() / 1000000
+      const timePurchased = statInfo.totalKeys.toNumber() / 1000000 * 0.5
 
       const totalKeys = await contract.getTotalKeys()
-      setTotalKeys(toNumber(totalKeys))
+      setTotalKeys(totalKeys.toNumber())
       setStatInfo({
         totalInvested,
         distributedRewards,
