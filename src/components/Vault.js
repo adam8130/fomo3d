@@ -25,26 +25,29 @@ export function Vault() {
 
   useEffect(() => {
     const init = async () => {
-      const contract = new ethers.Contract(
-        process.env.REACT_APP_CONTRACT_ADDRESS, 
-        Fomo3DContractABI, 
-        signer
-      )
-
-      const vaultInfo = await contract.getVault()
-      console.log('vaultInfo', vaultInfo)
-
-      const expectedBenefits = vaultInfo.expected.toNumber() / 1000000
-      const availableBenefits = vaultInfo.avaliable.toNumber() / 1000000
-      const referralBouns = vaultInfo.referral.toNumber() / 1000000
-      const totalGains = availableBenefits + referralBouns
-
-      setVaultInfo({
-        expectedBenefits,
-        availableBenefits,
-        referralBouns,
-        totalGains
-      })
+      try {
+        const contract = new ethers.Contract(
+          process.env.REACT_APP_CONTRACT_ADDRESS, 
+          Fomo3DContractABI, 
+          signer
+        )
+  
+        const vaultInfo = await contract.getVault()
+  
+        const expectedBenefits = vaultInfo.expected.toNumber() / 1000000
+        const availableBenefits = vaultInfo.avaliable.toNumber() / 1000000
+        const referralBouns = vaultInfo.referral.toNumber() / 1000000
+        const totalGains = availableBenefits + referralBouns
+  
+        setVaultInfo({
+          expectedBenefits,
+          availableBenefits,
+          referralBouns,
+          totalGains
+        })
+      } catch (err) {
+        console.log(err)
+      }
     }
     init()
   }, [])

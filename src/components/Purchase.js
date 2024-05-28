@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ROEContractABI } from '../plugin/abi/RoeABI'
 import { Fomo3DContractABI } from '../plugin/abi/Fomo3DAbi'
 import { ethers } from 'ethers'
-import { provider, signer } from '../plugin/ethers'
+import { changeNetwork, provider, signer } from '../plugin/ethers'
 import { motion } from 'framer-motion'
 import { useStore } from '../zustand/store'
 import { TeamCard } from './TeamCard'
@@ -42,8 +42,8 @@ const TeamInfo = [
 
 export function Purchase() {
 
-  const { contract, isColddowning } = useStore()
-  const { setTextDialog, setIsLoading, setInfoDialog } = useStore()
+  const { contract, walletAddress, isColddowning } = useStore()
+  const { setTextDialog, setIsLoading, setInfoDialog, setWalletAddress } = useStore()
 
   const [selectedTeamIdx, setSelectedTeamIdx] = useState(0)
   const [selectedKeyAmount, setSelectedKeyAmount] = useState(1)
@@ -79,9 +79,6 @@ export function Purchase() {
       ? bigIntKeyPrice * amount 
       : bigIntKeyPrice * ((1 - (1.01 ** amount)) / (1 - 1.01))
 
-    console.log('calculatedPrice', calculatedPrice)
-    console.log('parseIntedPrice', Math.round(calculatedPrice))
-
     setFinalKeyPrice(Math.round(calculatedPrice))
     setSelectedKeyAmount(amount)
   }
@@ -89,6 +86,22 @@ export function Purchase() {
   const handleSendROE = async () => {
     await provider.send('eth_requestAccounts', [])
     setPurchaseDialog(true)
+  }
+
+  const connectWallet = async () => {
+    try {
+      const { chainId } = await provider.getNetwork()
+  
+      if (chainId !== Number(process.env.REACT_APP_CHAIN_ID)) {
+        return await changeNetwork()
+      }
+      await provider.send('eth_requestAccounts', [])
+      const walletAddress = signer.getAddress()
+      setWalletAddress(walletAddress)
+    } catch (err) {
+      console.log(err)
+    }
+    
   }
 
   return (
@@ -107,7 +120,6 @@ export function Purchase() {
               value={selectedKeyAmount}
               onChange={(e) => {
                 const v = parseInt(e.target.value, 10);
-                
                 if (e.target.value.includes('.') || isNaN(v)) {
                   setSelectedKeyAmount('')
                 } 
@@ -138,16 +150,17 @@ export function Purchase() {
               }
               onClick={() => handleSelectKeys(item)}
             >
-              {item} {idx < 2 && 'Keys'}
+              {item}
+              {idx === 0 ? ' Key' : idx < 2 ? ' Keys' : ''}
             </span>
           ))}
         </div>
         <div className="flex justify-between">
           <span 
             className="w-full h-[40px] bg-[#ffa95e] text-center leading-[40px] rounded cursor-pointer text-white border border-[#ffa95e] hover:bg-[#ffa95e20] transition-3"
-            onClick={() => handleSendROE()}
+            onClick={() => walletAddress ? handleSendROE() : connectWallet()}
           >
-            Send ROE
+            {walletAddress ? 'Send ROE' : 'Connect Wallet'}
           </span>
         </div>
         <p className="text-[14px] text-[#ffa95e] text-center font-[300] pb-3 border-b border-[#22222290]">

@@ -6,7 +6,7 @@ export function TeamCard({ icon, title, desc, activated }) {
     >
       <img className="w-[60px] h-[60px]" src={icon} alt={title} />
       <p className='text-[14px]'>{title}</p>
-      <p className='text-[12px] mt-[-12px] text-center px-2'>{desc}</p>
+      <p className='text-[12px] max-sm:text-[10px] mt-[-6px] max-sm:mt-[-4px] text-center px-2'>{desc}</p>
     </div>
   )
 }

@@ -177,7 +177,7 @@ export default function App() {
         const endBlock = await contract.provider.getBlockNumber();
         if (startBlock.toNumber()) {
           const logs = await getLogsInRange(filter, startBlock.toNumber(), endBlock);
-          console.log('logs', logs.slice(-4).reverse());
+          // console.log('logs', logs.slice(-4).reverse());
           setBoughtRecords(logs.slice(-4).reverse());
         }
       } catch (error) {
