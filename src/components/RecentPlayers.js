@@ -28,11 +28,11 @@ export function RecentPlayers() {
                 <span 
                   style={
                     record.args.teamId.toNumber() === 0
-                      ? { color: '#ff9cba' }
+                      ? { color: '#32a7e6' }
                     : record.args.teamId.toNumber() === 1
-                      ? { color: '#fecb4b' }
+                      ? { color: '#e04848' }
                     : record.args.teamId.toNumber() === 2
-                      ? { color: '#a178f9' }
+                      ? { color: '#c59c73' }
                     : { color: '#90c052' }
                   }
                 >

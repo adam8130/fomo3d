@@ -10,19 +10,6 @@ export const Fomo3DContractABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "time",
-        type: "uint256",
-      },
-    ],
-    name: "OnGameStarted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: true,
         internalType: "address",
         name: "player",
@@ -43,7 +30,7 @@ export const Fomo3DContractABI = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "boughtKeys",
+        name: "boughtElfs",
         type: "uint256",
       },
       {
@@ -53,7 +40,20 @@ export const Fomo3DContractABI = [
         type: "uint256",
       },
     ],
-    name: "OnKeyBought",
+    name: "OnElfBought",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+    ],
+    name: "OnGameStarted",
     type: "event",
   },
   {
@@ -63,6 +63,12 @@ export const Fomo3DContractABI = [
         indexed: false,
         internalType: "uint256",
         name: "startTime",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "depth",
         type: "uint256",
       },
       {
@@ -133,6 +139,20 @@ export const Fomo3DContractABI = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "DEPTH_DIGGING",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "DEPTH_RANGE",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "MIN_PRICE",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
@@ -162,20 +182,6 @@ export const Fomo3DContractABI = [
   },
   {
     inputs: [],
-    name: "ROUND_INCREASE_TIME",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "ROUND_MAX_TIME",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "START_BLOCK",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
@@ -194,7 +200,7 @@ export const Fomo3DContractABI = [
       { internalType: "uint256", name: "_teamId", type: "uint256" },
       { internalType: "uint256", name: "_amount", type: "uint256" },
     ],
-    name: "buyKey",
+    name: "buyElf",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -222,7 +228,7 @@ export const Fomo3DContractABI = [
   },
   {
     inputs: [],
-    name: "getEndTime",
+    name: "getGoal",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -230,13 +236,6 @@ export const Fomo3DContractABI = [
   {
     inputs: [],
     name: "getMyEarnings",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getRemainingTime",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -251,10 +250,10 @@ export const Fomo3DContractABI = [
       { internalType: "uint256", name: "pool", type: "uint256" },
       { internalType: "uint256", name: "teamPool", type: "uint256" },
       { internalType: "uint256", name: "startTime", type: "uint256" },
-      { internalType: "uint256", name: "endTime", type: "uint256" },
-      { internalType: "uint256", name: "keyPrice", type: "uint256" },
-      { internalType: "uint256[4]", name: "teamKeys", type: "uint256[4]" },
-      { internalType: "uint256[4]", name: "teamPlayers", type: "uint256[4]" },
+      { internalType: "uint256", name: "goal", type: "uint256" },
+      { internalType: "uint256", name: "elfPrice", type: "uint256" },
+      { internalType: "uint256[3]", name: "teamElfs", type: "uint256[3]" },
+      { internalType: "uint256[3]", name: "teamPlayers", type: "uint256[3]" },
       { internalType: "bool", name: "ended", type: "bool" },
     ],
     stateMutability: "view",
@@ -262,7 +261,7 @@ export const Fomo3DContractABI = [
   },
   {
     inputs: [{ internalType: "uint256", name: "_rId", type: "uint256" }],
-    name: "getRoundTotalKeys",
+    name: "getRoundTotalElfs",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -273,14 +272,15 @@ export const Fomo3DContractABI = [
     outputs: [
       { internalType: "uint256", name: "totalInvested", type: "uint256" },
       { internalType: "uint256", name: "totalDistributed", type: "uint256" },
-      { internalType: "uint256", name: "totalKeys", type: "uint256" },
+      { internalType: "uint256", name: "totalElfs", type: "uint256" },
+      { internalType: "uint256", name: "totalDigged", type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "getTotalKeys",
+    name: "getTotalElfs",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -335,7 +335,7 @@ export const Fomo3DContractABI = [
       { internalType: "uint256", name: "adviceReward", type: "uint256" },
       { internalType: "uint256", name: "withdrawnReward", type: "uint256" },
       { internalType: "uint256", name: "teamId", type: "uint256" },
-      { internalType: "uint256", name: "ownedKeys", type: "uint256" },
+      { internalType: "uint256", name: "ownedElfs", type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",
@@ -359,11 +359,31 @@ export const Fomo3DContractABI = [
       { internalType: "uint256", name: "pool", type: "uint256" },
       { internalType: "uint256", name: "teamPool", type: "uint256" },
       { internalType: "uint256", name: "startTime", type: "uint256" },
-      { internalType: "uint256", name: "endTime", type: "uint256" },
-      { internalType: "uint256", name: "keyPrice", type: "uint256" },
+      { internalType: "uint256", name: "goal", type: "uint256" },
+      { internalType: "uint256", name: "elfPrice", type: "uint256" },
       { internalType: "bool", name: "ended", type: "bool" },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_min", type: "uint256" },
+      { internalType: "uint256", name: "_max", type: "uint256" },
+    ],
+    name: "setDepthDigging",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_min", type: "uint256" },
+      { internalType: "uint256", name: "_max", type: "uint256" },
+    ],
+    name: "setDepthRange",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

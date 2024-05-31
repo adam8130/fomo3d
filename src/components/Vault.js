@@ -7,9 +7,9 @@ import { signer } from "../plugin/ethers"
 import Question_Icon from '../assets/circle-question.svg'
 
 const VaultInfo = [
-  "• Expected Benefit: The additional reward amount you can receive at the end of the current round, influenced by the team chosen by the last Key buyer and the number of Keys you purchased. This cannot be withdrawn until the round ends.",
-  "• Available Benefits: The accumulated profit-sharing amount from each Key, the extra reward amount from the previous round, and the winning prize if you are the winner. Can be withdrawn at any time.",
-  "• Referral Bonus: The bonus for the referrer. If another player enters your wallet address when purchasing Keys, you will receive the referral bonus. Can be withdrawn at any time.",
+  "• Expected Benefit: The additional reward amount you can receive at the end of the current round, influenced by the team chosen by the last Elf buyer and the number of Elves you purchased. This cannot be withdrawn until the round ends.",
+  "• Available Benefits: The accumulated profit-sharing amount from each Elf, the extra reward amount from the previous round, and the winning prize if you are the winner. Can be withdrawn at any time.",
+  "• Referral Bonus: The bonus for the referrer. If another player enters your wallet address when purchasing Elves, you will receive the referral bonus. Can be withdrawn at any time.",
   "• Total Gains: The current amount you can withdraw. You must withdraw the entire amount at once; partial withdrawals are not allowed.",
 ]
 
@@ -85,25 +85,25 @@ export function Vault() {
       <div className="h-[400px] flex flex-col p-4 bg-[rgba(10,10,10,.4)] gap-[18px]">
         <div className="flex justify-between gap-[6px] items-center">
           <span className="text-[18px]">Expected Benefits</span>
-          <span className="text-[32px] max-lg:text-[24px]">
+          <span className="text-[30px] max-lg:text-[24px]">
             {vaultInfo.expectedBenefits ? vaultInfo.expectedBenefits.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center">
           <span className="text-[18px]">Available Benefits</span>
-          <span className="text-[32px] max-lg:text-[24px]">
+          <span className="text-[30px] max-lg:text-[24px]">
             {vaultInfo.availableBenefits ? vaultInfo.availableBenefits.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center pb-[18px] border-b border-[#22222290]">
           <span className="text-[18px]">Referral Bouns</span>
-          <span className="text-[32px] max-lg:text-[24px]">
+          <span className="text-[30px] max-lg:text-[24px]">
             {vaultInfo.referralBouns ? vaultInfo.referralBouns.toFixed(6) : 0} ROE
           </span>
         </div>
         <div className="flex justify-between gap-[6px] items-center relative">
           <span className="text-[18px]">Total Gains</span>
-          <span className="text-[32px] max-lg:text-[24px] [text-shadow:0_0_8px_#a178f9]">
+          <span className="text-[30px] max-lg:text-[24px] [text-shadow:0_0_8px_#a178f9]">
             {vaultInfo.totalGains ? vaultInfo.totalGains.toFixed(6) : 0} ROE
           </span>
           {/* <p className="absolute right-0 top-[42px]">

@@ -4,18 +4,18 @@ import moment from 'moment';
 
 import ROE_coin from '../assets/roe.webp';
 import Question_Icon from '../assets/circle-question.svg'
+import { Shovel } from 'lucide-react';
 
 const StatInfo = [
-  "• Total Invested: The total amount of ROE invested by all players in purchasing Keys so far.",
+  "• Total Invested: The total amount of ROE invested by all players in purchasing Elves so far.",
   "• Distributed Rewards: The total amount of rewards distributed so far.",
-  "• Time Purchased: The total accumulated time added to the countdown by purchasing Keys so far.",
+  "• Digging Depth: The total accumulated digging depth by sending Elves so far.",
 ]
 
 export function Stat() {
 
   const { contract, roundId, setInfoDialog } = useStore()
 
-  const [totalKeys, setTotalKeys] = useState(0)
   const [statInfo, setStatInfo] = useState({
     totalInvested: 0,
     distributedRewards: 0,
@@ -30,10 +30,9 @@ export function Stat() {
 
       const totalInvested = statInfo.totalInvested.toNumber() / 1000000
       const distributedRewards = statInfo.totalDistributed.toNumber() / 1000000
-      const timePurchased = statInfo.totalKeys.toNumber() / 1000000 * 0.5
+      const timePurchased = statInfo.totalDigged.toNumber()
+      // console.log(statInfo)
 
-      const totalKeys = await contract.getTotalKeys()
-      setTotalKeys(totalKeys.toNumber())
       setStatInfo({
         totalInvested,
         distributedRewards,
@@ -70,13 +69,13 @@ export function Stat() {
           {/* <p className="absolute right-0 top-[42px]">500,000 USDT</p> */}
         </div>
         <div className="flex justify-between items-center gap-[6px] relative">
-          <span className="text-[18px]">Time Purchased</span>
-          <span className="text-[32px] max-lg:text-[24px] [text-shadow:0_0_8px_#a178f9]">
-            {totalKeys 
-              ? moment.utc(moment.duration(totalKeys * 30, 'second').asMilliseconds()).format('HH:mm:ss')
-              : '--:--:--'
-            }
-          </span>
+          <span className="text-[18px]">Digging Depth</span>
+          <div className="text-[32px] max-lg:text-[24px] flex items-center gap-[8px]">
+            <span className="text-[32px] max-lg:text-[24px] [text-shadow:0_0_8px_#a178f9]">
+              {statInfo.timePurchased}
+            </span>
+            <Shovel className="w-[28px] h-[28px] mx-[3.5px] fill-[rgba(240,240,240,5)]" strokeWidth={2.5} />
+          </div>
         </div>
       </div>
       <img className="absolute right-5 top-5 w-[20px] h-[20px]" src={Question_Icon} alt="information" onClick={() => setInfoDialog(StatInfo)} />

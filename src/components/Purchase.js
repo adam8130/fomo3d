@@ -8,10 +8,10 @@ import { useStore } from '../zustand/store'
 import { TeamCard } from './TeamCard'
 import { TeamCardsOptions } from '../const/const'
 
-import Apple_Icon from '../assets/apple.webp'
-import Banana_Icon from '../assets/banana.webp'
-import Lemon_Icon from '../assets/lemon.webp'
-import Grape_Icon from '../assets/grape.webp'
+import Water_Icon from '../assets/water.png'
+import Fire_Icon from '../assets/fire.png'
+import Earth_Icon from '../assets/earth.png'
+
 import Question_Icon from '../assets/circle-question.svg'
 
 const BuyKeysOptions = [
@@ -23,21 +23,20 @@ const BuyKeysOptions = [
 ]
 
 const info = [
-  "1. Each round begins with a 3-hour cooldown period. During this time, players who purchase Keys will not increase the Key price, and no rewards will be distributed until the game officially starts.",
-  "2. After the cooldown period ends, a 24-hour countdown timer will begin. Each Key purchase will add 30 seconds to the timer, but the countdown will never exceed 24 hours.",
-  "3. After the cooldown period, each Key purchase will increase the Key price by 1%.",
-  "4. When purchasing a Key, players must choose a team. The rewards from purchased Keys will be distributed according to the chosen team’s reward distribution ratio. Subsequent Key purchases will partially reward all Key holders in the current round.",
-  "5. Each Key purchase has a chance to trigger a lucky airdrop reward.",
-  "6. After the cooldown period, every 33rd Key buyer and every multiple of 33 will receive a discount on the Key price.",
-  "7. When the timer reaches zero, the game ends. The player who made the last Key purchase determines the winning team and becomes the winning player. The winning team determines the distribution of the jackpot, and the winning player receives the winning prize from the jackpot.",
+  "1. Each round begins with a 1-hour cooldown period. During this time, players who send Elves will not increase the Elf price, and no rewards will be distributed until the game officially starts.",
+  "2. After the cooldown period ends, a randomly Goal Depth will show up. Each Elf sent will dig 3 to 5 depth to the Goal.",
+  "3. After the cooldown period, each Elf sent will increase the Elf price by 1%.",
+  "4. When sending Elf , players must choose a team. The rewards from sent Elves will be distributed according to the chosen team’s reward distribution ratio. Subsequent Elf purchases will partially reward all Elf holders in the current round.",
+  "5. Each Elf purchase has a chance to trigger a lucky airdrop reward.",
+  "6. After the cooldown period, every 33rd Elf and every multiple of 33 will receive a discount on the Elf price.",
+  "7. When the Goal Depth run to zero, the game ends. The player who made the last Elf purchase determines the winning team and becomes the winning player. The winning team determines the distribution of the jackpot, and the winning player receives the winning prize from the jackpot.",
 ]
 
 const TeamInfo = [
-  "When purchasing a Key, players must choose one of the following teams, each with different reward distribution ratios:",
-  "• Apple Team: 45% to the jackpot, 31% to the current round’s players. Higher emphasis on the jackpot.",
-  "• Banana Team: 30% to the jackpot, 46% to the current round’s players. Higher emphasis on the current round’s players.",
-  "• Grape Team: 50% to the jackpot, 26% to the current round’s players. Highest emphasis on the jackpot.",
-  "• Lemon Team: 38% to the jackpot, 38% to the current round’s players. Balanced distribution.",
+  "When purchasing a Elf, players must choose one of the following teams, each with different reward distribution ratios:",
+  "• Water Team: 50% to the jackpot, 25% to the current round’s players. Higher emphasis on the jackpot.",
+  "• Fire Team: 20% to the jackpot, 55% to the current round’s players. Higher emphasis on the current round’s players.",
+  "• Earth Team: 40% to the jackpot, 35% to the current round’s players. Balanced distribution.",
 ]
 
 export function Purchase() {
@@ -108,7 +107,7 @@ export function Purchase() {
     <>
       <div className="py-3 p-5 flex flex-col gap-[18px] text-white relative">
         <h1 className="text-[20px] pb-3 border-b border-[#22222290]">
-          Keyring
+          Mining
         </h1>
         <p className="text-[14px]">
           Purchase of {bigIntKeyPrice / 1000000} ROE or more have a {currentAirdropTracker}% chance to win some of  the {airdropReward} ROE airdrop pot. instantly
@@ -123,6 +122,10 @@ export function Purchase() {
                 if (e.target.value.includes('.') || isNaN(v)) {
                   setSelectedKeyAmount('')
                 } 
+                else if (v > 100) {
+                  setSelectedKeyAmount(100)
+                  handleSelectKeys(100)
+                }
                 else {
                   handleSelectKeys(v)
                 }
@@ -130,7 +133,9 @@ export function Purchase() {
               className="w-[50px] text-black outline-none text-center" 
               maxLength={5}
             />
-            <span className='text-black'>Key{selectedKeyAmount > 1 && 's'}</span>
+            <span className='text-black'>
+              {selectedKeyAmount > 1 ? 'Elves' : 'Elf'}
+            </span>
           </div>
           <span className="w-[30%] h-[40px] bg-[#dedede] text-center leading-[40px] rounded-r cursor-pointer text-[#1e1d1d]">
             {finalKeyPrice / 1000000} ROE
@@ -151,7 +156,7 @@ export function Purchase() {
               onClick={() => handleSelectKeys(item)}
             >
               {item}
-              {idx === 0 ? ' Key' : idx < 2 ? ' Keys' : ''}
+              {idx === 0 ? ' Elf' : idx < 2 ? ' Elves' : ''}
             </span>
           ))}
         </div>
@@ -164,7 +169,7 @@ export function Purchase() {
           </span>
         </div>
         <p className="text-[14px] text-[#ffa95e] text-center font-[300] pb-3 border-b border-[#22222290]">
-          Send ROE, buy lucky keys to win big rewards.
+          Send ROE, Hire the elves to dig deeper.
         </p>
         <h1 className="text-[20px] relative">
           Choose a Team
@@ -172,16 +177,16 @@ export function Purchase() {
         </h1>
         <div className="flex gap-[6px]">
           {TeamCardsOptions.map((item, idx) => (
-            <div key={idx} className='w-[25%]' onClick={() => setSelectedTeamIdx(idx)}>
+            <div key={idx} className='w-[33%]' onClick={() => setSelectedTeamIdx(idx)}>
               <TeamCard
                 key={idx} 
-                icon={idx === 0 ? Apple_Icon : idx === 1 ? Banana_Icon : idx === 2 ? Grape_Icon : Lemon_Icon} 
+                icon={idx === 0 ? Water_Icon : idx === 1 ? Fire_Icon : Earth_Icon} 
                 title={item} 
                 activated={selectedTeamIdx === idx}
                 desc={
-                  idx === 0 ? '+ Balanced of Banana and Grape'
-                  : idx === 1 ? '+ Maximize ROE to current round'
-                  : idx === 2 ? '+ Most ROE to Jackpot'
+                  idx === 0 ? '+ Most ROE to Jackpot'
+                  : idx === 1 ? '+ Maximize ROE to current round player'
+                  : idx === 2 ? '+ Balanced distribution'
                   : '+ Balanced distribution'
                 }
               />
@@ -207,6 +212,7 @@ export function Purchase() {
 
 function PurchaseDialog({ 
   contract,
+  selectedKeyAmount,
   selectedTeamIdx,
   finalKeyPrice, 
   setPurchaseDialog,
@@ -249,7 +255,7 @@ function PurchaseDialog({
         Fomo3DContractABI,
         signer
       )
-      const tx = await Fomo3DContract.buyKey(
+      const tx = await Fomo3DContract.buyElf(
         validAddress || '0x0000000000000000000000000000000000000000', 
         selectedTeamIdx, 
         finalKeyPrice

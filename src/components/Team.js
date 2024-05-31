@@ -1,29 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../zustand/store'
 
-import Apple_Icon from '../assets/apple.webp'
-import Banana_Icon from '../assets/banana.webp'
-import Grape_Icon from '../assets/grape.webp'
-import Lemon_Icon from '../assets/lemon.webp'
-import Key_icon from '../assets/key.svg'
+import Water_Icon from '../assets/water.png'
+import Fire_Icon from '../assets/fire.png'
+import Earth_Icon from '../assets/earth.png'
+import Elve_icon from "../assets/elves.webp";
 
 export function Team() {
 
   const { contract } = useStore()
   const [teamInfo, setTeamInfo] = useState({
-    apple: {
+    water: {
       key: 0,
       player: 0
     },
-    banana: {
+    fire: {
       key: 0,
       player: 0
     },
-    grape: {
-      key: 0,
-      player: 0
-    },
-    lemon: {
+    earth: {
       key: 0,
       player: 0
     }
@@ -35,22 +30,23 @@ export function Team() {
     const getCurrentRound = async () => {
       const roundId = await contract.CURRENT_ROUND_ID()
       const currentRound = await contract.getRound(roundId)
+      console.log(currentRound)
       setTeamInfo({
-        apple: {
-          key: currentRound.teamKeys[0].toNumber(),
-          player: currentRound.teamPlayers[0].toNumber()
+        water: {
+          elf: currentRound.teamElfs[0]?.toNumber(),
+          player: currentRound.teamPlayers[0]?.toNumber()
         },
-        banana: {
-          key: currentRound.teamKeys[1].toNumber(),
-          player: currentRound.teamPlayers[1].toNumber()
+        fire: {
+          elf: currentRound.teamElfs[1]?.toNumber(),
+          player: currentRound.teamPlayers[1]?.toNumber()
         },
-        grape: {
-          key: currentRound.teamKeys[2].toNumber(),
-          player: currentRound.teamPlayers[2].toNumber()
+        earth: {
+          elf: currentRound.teamElfs[2]?.toNumber(),
+          player: currentRound.teamPlayers[2]?.toNumber()
         },
         lemon: {
-          key: currentRound.teamKeys[3].toNumber(),
-          player: currentRound.teamPlayers[3].toNumber()
+          elf: currentRound.teamElfs[3]?.toNumber(),
+          player: currentRound.teamPlayers[3]?.toNumber()
         }
       })
     }
@@ -62,49 +58,50 @@ export function Team() {
       <h1 className="text-[20px] pb-3 border-b border-[#22222290]">
         Team
       </h1>
-      <div className="flex flex-wrap gap-[2%]">
-        <div className="w-[49%] h-full pt-4 pb-6 flex flex-col gap-[8px] items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
-          <img className="w-[60px] h-[60px] mb-[8px]" src={Apple_Icon} alt='Apple Team' />
-          <p className='text-[20px]'>Apple Team</p>
-          <div className='text-[14px] flex items-center gap-[6px]'>
-            <span>{teamInfo['apple'].key} key</span>
-            <img className="w-[12px] h-[12px]" src={Key_icon} alt='key' />
+      <div className="flex flex-col gap-[8px]">
+        <div className="w-full h-full pt-4 pb-6 flex gap-[8px] justify-around items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
+          <img 
+            className="w-[58px] max-sm:w-[48px] h-[60px] max-sm:h-[48px]" 
+            src={Water_Icon} 
+            alt='Water Team' 
+          />
+          <p className='text-[18px] max-sm:text-[16px]'>Water Team</p>
+          <div className='text-[20px] max-sm:text-[14px] flex items-center gap-[6px]'>
+            <span>{teamInfo['water'].elf} Elf</span>
+            <img className="w-[20px] h-[20px]" src={Elve_icon} alt='elf' />
           </div>
-          <h3 className="text-[20px] [text-shadow:0_0_8px_#a178f9]">
-            {teamInfo['apple'].player} Players
+          <h3 className="text-[20px] max-sm:text-[14px] [text-shadow:0_0_8px_#a178f9]">
+            {teamInfo['water'].player} Players
           </h3>
         </div>
-        <div className="w-[49%] h-full pt-4 pb-6 flex flex-col gap-[8px] items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
-          <img className="w-[60px] h-[60px] mb-[8px]" src={Banana_Icon} alt='Banana Team' />
-          <p className='text-[20px]'>Banana Team</p>
-          <div className='text-[14px] flex items-center gap-[6px]'>
-            <span>{teamInfo['banana'].key} key</span>
-            <img className="w-[12px] h-[12px]" src={Key_icon} alt='key' />
+        <div className="w-full h-full pt-4 pb-6 flex gap-[8px] justify-around items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
+          <img 
+            className="w-[58px] max-sm:w-[48px] h-[60px] max-sm:h-[48px]" 
+            src={Fire_Icon} 
+            alt='Fire Team' 
+          />
+          <p className='text-[18px] max-sm:text-[16px]'>Fire Team</p>
+          <div className='text-[20px] max-sm:text-[14px] flex items-center gap-[6px]'>
+            <span>{teamInfo['fire'].elf} Elf</span>
+            <img className="w-[20px] h-[20px]" src={Elve_icon} alt='elf' />
           </div>
-          <h3 className="text-[20px] [text-shadow:0_0_8px_#a178f9]">
-            {teamInfo['banana'].player} Players
+          <h3 className="text-[20px] max-sm:text-[14px] [text-shadow:0_0_8px_#a178f9]">
+            {teamInfo['fire'].player} Players
           </h3>
         </div>
-        <div className="mt-[4%] w-[49%] h-full pt-4 pb-6 flex flex-col gap-[8px] items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
-          <img className="w-[60px] h-[60px] mb-[8px]" src={Grape_Icon} alt='Grape Team' />
-          <p className='text-[20px]'>Grape Team</p>
-          <div className='text-[14px] flex items-center gap-[6px]'>
-            <span>{teamInfo['grape'].key} key</span>
-            <img className="w-[12px] h-[12px]" src={Key_icon} alt='key' />
+        <div className="w-full h-full pt-4 pb-6 flex gap-[8px] justify-around items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
+          <img 
+            className="w-[58px] max-sm:w-[48px] h-[60px] max-sm:h-[48px]" 
+            src={Earth_Icon} 
+            alt='Earth Team' 
+          />
+          <p className='text-[18px] max-sm:text-[16px]'>Earth Team</p>
+          <div className='text-[20px] max-sm:text-[14px] flex items-center gap-[6px]'>
+            <span>{teamInfo['earth'].elf} Elf</span>
+            <img className="w-[20px] h-[20px]" src={Elve_icon} alt='elf' />
           </div>
-          <h3 className="text-[20px] [text-shadow:0_0_8px_#a178f9]">
-            {teamInfo['grape'].player} Players
-          </h3>
-        </div>
-        <div className="mt-[4%] w-[49%] h-full pt-4 pb-6 flex flex-col gap-[8px] items-center bg-[rgba(40,40,40,.3)] rounded cursor-pointer">
-          <img className="w-[60px] h-[60px] mb-[8px]" src={Lemon_Icon} alt='Lemon Team' />
-          <p className='text-[20px]'>Lemon Team</p>
-          <div className='text-[14px] flex items-center gap-[6px]'>
-            <span>{teamInfo['lemon'].key} key</span>
-            <img className="w-[12px] h-[12px]" src={Key_icon} alt='key' />
-          </div>
-          <h3 className="text-[20px] [text-shadow:0_0_8px_#a178f9]">
-            {teamInfo['lemon'].player} Players
+          <h3 className="text-[20px] max-sm:text-[14px] [text-shadow:0_0_8px_#a178f9]">
+            {teamInfo['earth'].player} Players
           </h3>
         </div>
       </div>

@@ -48,13 +48,14 @@ input[type="number"]::-webkit-inner-spin-button {
   height: 88%;
   position: absolute;
   border-radius: 50%;
-  background: rgb(12, 12, 12);
+  background: rgb(255, 255, 255, .98);
 }
 
 .circle-value {
   font-size: 24px;
+  font-weight: 600;
   position: relative;
-  color: white;
+  color: #5198a8;
 }
 
 .fixed-center {

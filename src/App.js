@@ -9,6 +9,7 @@ import { Stat } from './components/Stat';
 import { Loading } from './components/Loading';
 import { TextDialog } from './components/TextDialog';
 import { InfoDialog } from './components/InfoDialog';
+import { Shovel } from 'lucide-react';
 
 import { ethers } from 'ethers';
 import { provider, signer } from './plugin/ethers';
@@ -102,7 +103,7 @@ export default function App() {
         const roundId = await contract.CURRENT_ROUND_ID()
         const walletAddress = await signer.getAddress()
         const userInfo = await contract.roundPlayers(roundId, walletAddress)
-        const userOwnedKeys = userInfo.ownedKeys.toNumber()
+        const userOwnedKeys = userInfo.ownedElfs.toNumber()
         setUserOwnedKeys(userOwnedKeys)
         setWalletAddress(walletAddress)
       } catch (err) {
@@ -119,7 +120,7 @@ export default function App() {
       const remainingColdTime = await contract.getColdDownTime()
       const remainingColdSeconds = remainingColdTime.toNumber()
 
-      const remainingEndTime = await contract.getRemainingTime()
+      const remainingEndTime = await contract.getGoal()
       const remainingEndSecond = remainingEndTime.toNumber()
 
       const isColddowning = remainingColdSeconds > 0
@@ -170,7 +171,7 @@ export default function App() {
     };
 
     const getBuyRecords = async () => {
-      const filter = contract.filters.OnKeyBought();
+      const filter = contract.filters.OnElfBought();
 
       try {
         const startBlock = await contract.START_BLOCK();
@@ -189,6 +190,8 @@ export default function App() {
   }, [contract, setBoughtRecords]);
 
   useEffect(() => {
+    if (isColddowning === false) return
+
     if (endTime !== null && endTime > 0) {
       const timer = setInterval(() => {
         setEndTime((prevTime) => prevTime - 1);
@@ -196,7 +199,7 @@ export default function App() {
       
       return () => clearInterval(timer)
     }
-  }, [endTime])
+  }, [endTime, isColddowning])
 
   // useEffect(() => {
   //   try {
@@ -223,12 +226,20 @@ export default function App() {
           <img className="w-[50px] h-[50px]" src={ROE_coin} alt="ROE coin" />
         </div>
         <div className='flex items-center translate-y-[-6px]'>
-          <img className="w-[35px] h-[35px]" src={Timer_icon} alt="Fomo3D Timer" />
+          {isColddowning ? (
+            <img className="w-[35px] h-[35px]" src={Timer_icon} alt="Fomo3D Timer" />
+          ) : (
+            <Shovel className="mr-1" color="#5198a8" strokeWidth={2.5} />
+          )}
           <span 
             className="font-[500] text-[22px]"
             style={{ color: isColddowning ? '#ea5e21' : '#5198a8' }}
           >
-            {endTime ? moment.utc(moment.duration(endTime, 'second').asMilliseconds()).format('HH:mm:ss') : '--:--:--'}
+            {
+              isColddowning 
+                ? endTime ? moment.utc(moment.duration(endTime, 'second').asMilliseconds()).format('HH:mm:ss') : '--:--:--'
+                : endTime ? endTime : '--:--:--'
+            }
           </span>
         </div>
         <div className='w-[70%] max-lg:w-[95%] bg-[#85faff40] py-2 text-center text-[#5198a8] overflow-hidden'>
@@ -268,7 +279,7 @@ export default function App() {
                     <p className="flex gap-[6px]">
                       <span>Bought:</span>
                       <span className='text-[#ffa95e] whitespace-nowrap'>
-                        {record.args.boughtKeys.toNumber()} Keys
+                        {record.args.boughtElfs.toNumber()} Elfs
                       </span>
                     </p>
                   </div>

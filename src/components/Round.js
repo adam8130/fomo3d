@@ -7,12 +7,13 @@ import moment from "moment-timezone";
 
 import ROE_coin from "../assets/roe.webp";
 import Key_icon from "../assets/key.svg";
+import Elve_icon from "../assets/elves.webp";
 import Question_Icon from "../assets/circle-question.svg";
 
 const RoundInfo = [
   "Definitions for the current round:",
   "• Jackpot: The total prize pool accumulated in the current round.",
-  "• Your Keys: The number of Keys you have purchased in the current round.",
+  "• Your Elves: The number of Elves you have purchased in the current round.",
   "• Your Earnings: The rewards you have accumulated in the current round that are ready to withdraw.",
 ];
 
@@ -42,12 +43,12 @@ export function Round({ endTime }) {
 
   useEffect(() => {
     let progress;
-    if (value < 100) {
+    if (value < 101) {
       progress = setInterval(() => {
         setValue((prevValue) => prevValue + 1);
         circleRef.current.style.background = `conic-gradient(
-          rgb(143, 0, 160), rgb(18, 47, 192) ${value * 3.6}deg,
-          rgb(12, 12, 12) ${value * 3.6}deg
+          #3883e0, #ff9cba ${value * 3.6}deg,
+          #ff987495 ${value * 3.6}deg
         )`;
       }, 30);
     }
@@ -60,7 +61,7 @@ export function Round({ endTime }) {
         Round #{roundId + 1}
       </h1>
       <h1 className="text-[32px] text-center">
-        Contract will {!isColddowning ? "drain" : "start"} in
+        {isColddowning ? 'Contract' : 'Mine'} will {isColddowning ? 'start' : 'drain'} in
       </h1>
       {/* <div 
         className="mx-auto w-[150px] h-[150px] rounded-[50%] bg-red-300 flex justify-center items-center"
@@ -71,11 +72,11 @@ export function Round({ endTime }) {
       <div className="circle-bar col-12 col-md-4 d-flex flex-md-column text-center">
         <div ref={circleRef} className="circle-progress">
           <div className="circle-value" data-value="94">
-            {endTime
-              ? moment
-                  .utc(moment.duration(endTime, "second").asMilliseconds())
-                  .format("HH:mm:ss")
-              : "--:--:--"}
+            {
+              isColddowning 
+                ? endTime ? moment.utc(moment.duration(endTime, 'second').asMilliseconds()).format('HH:mm:ss') : '--:--:--'
+                : endTime ? endTime : '--:--:--'
+            }
           </div>
         </div>
       </div>
@@ -91,10 +92,10 @@ export function Round({ endTime }) {
           </p> */}
         </div>
         <div className="flex justify-between items-center relative">
-          <span className="text-[20px]">Your Keys</span>
+          <span className="text-[20px]">Your Elves</span>
           <div className="text-[32px] max-lg:text-[24px] flex items-center gap-[8px]">
             <span>{userOwnedKeys}</span>
-            <img className="w-[20px] h-[20px]" src={Key_icon} alt="ROE" />
+            <img className="w-[24px] h-[24px]" src={Elve_icon} alt="ROE" />
           </div>
           {/* <p className="absolute right-0 top-[42px]">
             500,000 USDT
