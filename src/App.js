@@ -9,6 +9,8 @@ import { Stat } from './components/Stat';
 import { Loading } from './components/Loading';
 import { TextDialog } from './components/TextDialog';
 import { InfoDialog } from './components/InfoDialog';
+import GoogleAnalytics from './components/GoogleAnalytics';
+
 
 import { ethers } from 'ethers';
 import { provider, signer } from './plugin/ethers';
@@ -215,6 +217,7 @@ export default function App() {
 
   return (
     <div className="w-full h-[120vh] max-lg:h-full flex flex-col relative">
+      <GoogleAnalytics/>
       <div className="h-[175px] bg-[#fdfdfd] flex flex-col items-center justify-between">
         <div className='flex items-center gap-[12px] mt-4 translate-x-[18px] '>
           <h1 className={`text-[42px] font-[900] bg-clip-text text-transparent ${Gradient_Text}`}>
