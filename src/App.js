@@ -50,6 +50,72 @@ const marqueeVariants = {
     }
   }
 };
+const gameRules = [
+  "1. Before each round starts, there is a 3-hour preparation period, followed by a 24-hour countdown.",
+  "2. Players can spend ROE to buy Keys.",
+  "3. Each Key purchase adds 30 seconds to the countdown.",
+  "4. The team chosen when buying Keys will affect reward distribution.",
+  "5. The last player to successfully buy a Key when the countdown ends will win 48% of the accumulated ROE in the prize pool.",
+  "",
+  "Game Flow:",
+  "6. The game cycle is Preparation Period > Official Start > Winner Emergence > Preparation Period.",
+  "",
+  "Preparation Period:",
+  "7. The preparation period lasts 3 hours. During this period, the ROE required to buy Keys is the initial price (currently set at 1 ROE) and does not add to the countdown.",
+  "",
+  "Official Start:",
+  "8. After the official start, a 24-hour countdown begins.",
+  "9. Each Key purchase increases the ROE price by 1.01x.",
+  "10. Each Key purchase adds 30 seconds to the countdown, up to a maximum of 24 hours.",
+  "11. The team (Apple, Banana, Grape, Lemon) chosen when buying Keys will affect reward distribution.",
+  "",
+  "Winner Emergence:",
+  "12. When the countdown reaches zero, the last player to successfully buy a Key becomes the winner.",
+  "13. The prize pool is distributed based on the team chosen during the last Key purchase.",
+  "14. After any player claims their prize, the game resets to the preparation period.",
+  "",
+  "Teams:",
+  "15. There are 4 teams in the game: Apple, Banana, Grape, Lemon.",
+  "16. When buying Keys, you must choose a team, and rewards are distributed according to the chosen team’s allocation ratio:",
+  "17. Apple Team: Prize pool ratio slightly higher than the current round players’ ratio.",
+  "18. Banana Team: Emphasizes the current round players’ ratio.",
+  "19. Grape Team: Emphasizes the prize pool ratio.",
+  "20. Lemon Team: Balanced distribution between the prize pool and current round players.",
+  "",
+  "Prize Distribution:",
+  "21. ROE spent on buying Keys is converted into rewards, with the distribution rules as follows:",
+  "",
+  "When buying Keys, the ROE distribution based on the chosen team:",
+  "22. Apple Team: 45% Prize Pool, 31% Current Round Players, 10% Airdrop, 2% Liquidity Pool, 2% Project Team, 10% Referrer, 100% Total",
+  "23. Banana Team: 30% Prize Pool, 46% Current Round Players, 10% Airdrop, 2% Liquidity Pool, 2% Project Team, 10% Referrer, 100% Total",
+  "24. Grape Team: 50% Prize Pool, 26% Current Round Players, 10% Airdrop, 2% Liquidity Pool, 2% Project Team, 10% Referrer, 100% Total",
+  "25. Lemon Team: 38% Prize Pool, 38% Current Round Players, 10% Airdrop, 2% Liquidity Pool, 2% Project Team, 10% Referrer, 100% Total",
+  "",
+  "When winning the prize, the distribution ratio for the team chosen by the last Key buyer:",
+  "26. Apple Team: 48% Winner, 35% Current Round Players, 15% Next Round, 2% Project Team, 100% Total",
+  "27. Banana Team: 48% Winner, 20% Current Round Players, 30% Next Round, 2% Project Team, 100% Total",
+  "28. Grape Team: 48% Winner, 15% Current Round Players, 35% Next Round, 2% Project Team, 100% Total",
+  "29. Lemon Team: 48% Winner, 25% Current Round Players, 25% Next Round, 2% Project Team, 100% Total",
+  "",
+  "Airdrop Rewards:",
+  "30. There is a chance to receive an airdrop reward when buying Keys, with the following mechanism:",
+  "31. The initial airdrop chance is 0.05%. Each Key purchase increases the chance by 0.1% for the next purchase.",
+  "32. The chance is determined at the time of purchase. Buying multiple Keys at once only counts as one chance.",
+  "33. When someone wins an airdrop reward, the chance resets to the initial rate.",
+  "34. The ROE spent on buying Keys affects the proportion of the airdrop prize pool you can win:",
+  "",
+  "ROE Spent  Airdrop Prize Pool Proportion:",
+  "35. 0.1 to 20 ROE: Win 25% of the small prize pool",
+  "36. 21 to 200 ROE: Win 50% of the small prize pool",
+  "37. Over 200 ROE: Win 75% of the small prize pool",
+  "",
+  "Referral Rules:",
+  "38. Each player who buys a Key can share their wallet address with others. Players who purchase Keys through this referral link will contribute a certain percentage (10%) back to the referrer.",
+  "39. Purchases without a referral address, with an incorrect address, or with an ineligible address will be considered without a referral (the rebate is added to the prize pool).",
+  "40. Eligibility: The address must have bought a Key in the current round."
+];
+
+
 
 export default function App() {
   
@@ -217,90 +283,118 @@ export default function App() {
 
   return (
     <div className="w-full h-[120vh] max-lg:h-full flex flex-col relative">
-      <GoogleAnalytics/>
+      <GoogleAnalytics />
       <div className="h-[175px] bg-[#fdfdfd] flex flex-col items-center justify-between">
-        <div className='flex items-center gap-[12px] mt-4 translate-x-[18px] '>
-          <h1 className={`text-[42px] font-[900] bg-clip-text text-transparent ${Gradient_Text}`}>
+        <div className="flex items-center gap-[12px] mt-4 translate-x-[18px] ">
+          <h1
+            className={`text-[42px] font-[900] bg-clip-text text-transparent ${Gradient_Text}`}
+          >
             {jackpot}
           </h1>
           <img className="w-[50px] h-[50px]" src={ROE_coin} alt="ROE coin" />
         </div>
-        <div className='flex items-center translate-y-[-6px]'>
-          <img className="w-[35px] h-[35px]" src={Timer_icon} alt="Fomo3D Timer" />
-          <span 
+        <div className="flex items-center translate-y-[-6px]">
+          <img
+            className="w-[35px] h-[35px]"
+            src={Timer_icon}
+            alt="Fomo3D Timer"
+          />
+          <span
             className="font-[500] text-[22px]"
-            style={{ color: isColddowning ? '#ea5e21' : '#5198a8' }}
+            style={{ color: isColddowning ? "#ea5e21" : "#5198a8" }}
           >
-            {endTime ? moment.utc(moment.duration(endTime, 'second').asMilliseconds()).format('HH:mm:ss') : '--:--:--'}
+            {endTime
+              ? moment
+                  .utc(moment.duration(endTime, "second").asMilliseconds())
+                  .format("HH:mm:ss")
+              : "--:--:--"}
           </span>
         </div>
-        <div className='w-[70%] max-lg:w-[95%] bg-[#85faff40] py-2 text-center text-[#5198a8] overflow-hidden'>
-          {
-            boughtRecords?.length > 0 ? (
-              <motion.div 
-                className="w-full flex gap-[12px]"
-                variants={marqueeVariants} 
-                animate="animate"
-              >
-                {lastWinner && (
-                  <div className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded">
-                    <p className="flex gap-[6px]">
-                      <span className="text-red-600 whitespace-nowrap">
-                        Last Winner: 
-                      </span>
-                      <span className='text-[#ffa95e] whitespace-nowrap'>
-                        {lastWinner}
-                      </span>
-                    </p>
-                    <p className="flex gap-[6px]">
-                      <span className="text-red-600 whitespace-nowrap">
-                        Prize: 
-                      </span>
-                      <span className='text-[#ffa95e] whitespace-nowrap'>
-                        {lastPrize} ROE
-                      </span>
-                    </p>
-                  </div>
-                )}
-                {boughtRecords?.map((record, idx) => (
-                  <div key={idx} className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded">
-                    <p className="flex gap-[6px]">
-                      <span>Player:</span>
-                      <span className='text-[#ffa95e] whitespace-nowrap'>{record.args.player}</span>
-                    </p>
-                    <p className="flex gap-[6px]">
-                      <span>Bought:</span>
-                      <span className='text-[#ffa95e] whitespace-nowrap'>
-                        {record.args.boughtKeys.toNumber()} Keys
-                      </span>
-                    </p>
-                  </div>
-                ))}
-              </motion.div>
-            ) : (
-              <span className="w-full text-center">No recent records</span>
-            )
-          }
+        <div className="w-[70%] max-lg:w-[95%] bg-[#85faff40] py-2 text-center text-[#5198a8] overflow-hidden">
+          {boughtRecords?.length > 0 ? (
+            <motion.div
+              className="w-full flex gap-[12px]"
+              variants={marqueeVariants}
+              animate="animate"
+            >
+              {lastWinner && (
+                <div className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded">
+                  <p className="flex gap-[6px]">
+                    <span className="text-red-600 whitespace-nowrap">
+                      Last Winner:
+                    </span>
+                    <span className="text-[#ffa95e] whitespace-nowrap">
+                      {lastWinner}
+                    </span>
+                  </p>
+                  <p className="flex gap-[6px]">
+                    <span className="text-red-600 whitespace-nowrap">
+                      Prize:
+                    </span>
+                    <span className="text-[#ffa95e] whitespace-nowrap">
+                      {lastPrize} ROE
+                    </span>
+                  </p>
+                </div>
+              )}
+              {boughtRecords?.map((record, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-[8px] bg-[rgba(255,255,255,.8)] px-2 rounded"
+                >
+                  <p className="flex gap-[6px]">
+                    <span>Player:</span>
+                    <span className="text-[#ffa95e] whitespace-nowrap">
+                      {record.args.player}
+                    </span>
+                  </p>
+                  <p className="flex gap-[6px]">
+                    <span>Bought:</span>
+                    <span className="text-[#ffa95e] whitespace-nowrap">
+                      {record.args.boughtKeys.toNumber()} Keys
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+          ) : (
+            <span className="w-full text-center">No recent records</span>
+          )}
         </div>
       </div>
-      <div className="w-full h-[97vh] object-cover flex justify-center gap-[28px] pt-[36px] pb-[36px] max-lg:flex-col max-lg:items-center max-lg:h-full max-lg:pt-6 max-lg:pb-20" 
-        style={{ background: `url(${Background}) no-repeat center center / cover` }}
+      <div
+        className="w-full h-[97vh] object-cover flex justify-center gap-[28px] pt-[36px] pb-[36px] max-lg:flex-col max-lg:items-center max-lg:h-full max-lg:pt-6 max-lg:pb-20"
+        style={{
+          background: `url(${Background}) no-repeat center center / cover`,
+        }}
       >
         <div className="w-[490px] max-lg:w-[95%] h-[630px]">
-          <div className="w-full h-[40px] flex gap-[4px] bg-transparent">
-            {Left_Pannel.map((item, idx) => (
-              <div 
-                key={idx}
-                className="h-full bg-[#dfdede] flex items-center justify-center py-3 px-5 rounded-t cursor-pointer transition-3 relative"
-                style={ leftActiveTab === idx ? { background: '#15141495', color: '#fff' } : {} }
-                onClick={() => setLeftActiveTab(idx)}
-              >
-                <span>{item}</span>
-                {leftActiveTab === idx && (
-                  <span className="w-[65%] h-[2px] bg-[#ffa95e] absolute bottom-1 left-[50%] translate-x-[-50%]" />
-                )}
-              </div>  
-            ))}
+          <div className="w-full h-[40px] flex gap-[4px] bg-transparent justify-between">
+            <div className="flex flex-row">
+              {Left_Pannel.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="h-full bg-[#dfdede] flex items-center justify-center py-3 px-5 rounded-t cursor-pointer transition-3 relative"
+                  style={
+                    leftActiveTab === idx
+                      ? { background: "#15141495", color: "#fff" }
+                      : {}
+                  }
+                  onClick={() => setLeftActiveTab(idx)}
+                >
+                  <span>{item}</span>
+                  {leftActiveTab === idx && (
+                    <span className="w-[65%] h-[2px] bg-[#ffa95e] absolute bottom-1 left-[50%] translate-x-[-50%]" />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div
+              className="w-[100px] h-[40px] bg-[#ffa95e] text-center leading-[40px] rounded cursor-pointer text-white border border-[#ffa95e] hover:bg-[#ffa95e20] transition-3"
+              onClick={() => setInfoDialog(gameRules)}
+            >
+              Game rules
+            </div>
           </div>
           <div className="w-full h-[600px] max-lg:h-full bg-[#15141495] rounded-b">
             <motion.div
@@ -309,33 +403,38 @@ export default function App() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {
-                leftActiveTab === 0 ? <Purchase /> :
-                leftActiveTab === 1 ? <Vault /> : <Purchase />
-              }
+              {leftActiveTab === 0 ? (
+                <Purchase />
+              ) : leftActiveTab === 1 ? (
+                <Vault />
+              ) : (
+                <Purchase />
+              )}
             </motion.div>
           </div>
         </div>
         <div className="w-[490px] max-lg:w-[95%] max-lg:mt-[24px] h-[630px]">
           <div className="w-full h-[40px] flex gap-[4px] bg-transparent">
             {Right_Pannel.map((label, idx) => (
-              <div 
+              <div
                 key={idx}
                 className="h-full bg-[#dfdede] flex items-center justify-center py-3 px-5 rounded-t cursor-pointer transition-3 relative"
-                style={ rightActiveTab === idx ? { background: '#15141495', color: '#fff' } : {} }
+                style={
+                  rightActiveTab === idx
+                    ? { background: "#15141495", color: "#fff" }
+                    : {}
+                }
                 onClick={() => setRightActiveTab(idx)}
               >
                 <span>
-                  {
-                    label === 'Recent Players' && window.innerWidth <= 768 
-                      ? label.split(' ')[0] 
-                      : label
-                  }
+                  {label === "Recent Players" && window.innerWidth <= 768
+                    ? label.split(" ")[0]
+                    : label}
                 </span>
                 {rightActiveTab === idx && (
                   <span className="w-[65%] h-[2px] bg-[#a178f9] absolute bottom-1 left-[50%] translate-x-[-50%]" />
                 )}
-              </div>  
+              </div>
             ))}
           </div>
           <div className="w-full h-[600px] max-lg:h-full bg-[#15141495] rounded-b">
@@ -345,30 +444,26 @@ export default function App() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {
-                rightActiveTab === 0 ? <Round endTime={endTime} /> :
-                rightActiveTab === 1 ? <Team /> :
-                rightActiveTab === 2 ? <RecentPlayers /> :
-                rightActiveTab === 3 ? <Stat /> : <Round />
-              }
+              {rightActiveTab === 0 ? (
+                <Round endTime={endTime} />
+              ) : rightActiveTab === 1 ? (
+                <Team />
+              ) : rightActiveTab === 2 ? (
+                <RecentPlayers />
+              ) : rightActiveTab === 3 ? (
+                <Stat />
+              ) : (
+                <Round />
+              )}
             </motion.div>
           </div>
         </div>
       </div>
-      {isLoading && (
-        <Loading />
-      )}
+      {isLoading && <Loading />}
       {textDialog && (
-        <TextDialog
-          textDialog={textDialog}
-          setTextDialog={setTextDialog}
-        />
+        <TextDialog textDialog={textDialog} setTextDialog={setTextDialog} />
       )}
-      {infoDialog && (
-        <InfoDialog 
-          setInfoDialog={setInfoDialog} 
-        />
-      )}
+      {infoDialog && <InfoDialog setInfoDialog={setInfoDialog} />}
     </div>
   );
 }
